@@ -1,68 +1,32 @@
-// Importe as dependências necessárias
-import React, { useState } from 'react';
-import ProductList from './ProductList';
+// EditProduct.tsx
+import React from 'react';
+import { Produto } from '../utils/localStorageUtil';
 import ProductForm from '../components/commons/ProductForm';
-import { Produto, getProdutosFromLocalStorage, limparLocalStorage } from '../utils/localStorageUtil';
 
-// Defina a sua página ProductList
-const ProductListPage: React.FC = () => {
-  const [produtos, setProdutos] = useState<Produto[]>(getProdutosFromLocalStorage());
-  const [editingProduct, setEditingProduct] = useState<Produto | null>(null);
+interface EditProductProps {
+  produto: Produto;
+  onSave: (produtoEditado: Produto) => void; // Corrigido para receber produto editado
+  onCancel: () => void;
+}
 
-  const handleEdit = (produto: Produto) => {
-    setEditingProduct(produto);
-  };
-
-  const handleSaveEdit = (editedProduct: Produto) => {
-    // Atualize o produto na lista
-    const updatedProducts = produtos.map((product) =>
-      product === editingProduct ? editedProduct : product
-    );
-
-    // Salve a lista atualizada no localStorage
-    // Substitua saveProdutoToLocalStorage pelo seu método correspondente
-    // (que deve atualizar o produto específico no armazenamento local)
-    // Exemplo: saveProdutoToLocalStorage(editedProduct);
-    // ...
-
-    // Atualize o estado dos produtos
-    setProdutos(updatedProducts);
-
-    // Limpe o estado de edição
-    setEditingProduct(null);
-  };
-
-  const handleCancelEdit = () => {
-    // Limpe o estado de edição
-    setEditingProduct(null);
-  };
-
-  const handleClean = () => {
-    // Limpe o localStorage
-    limparLocalStorage();
-
-    // Limpe o estado dos produtos
-    setProdutos([]);
+const EditProduct: React.FC<EditProductProps> = ({ produto, onSave, onCancel }) => {
+  const handleSalvar = (produtoEditado: Produto) => {
+    onSave(produtoEditado); // Chama a função onSave para salvar o produto editado
   };
 
   return (
     <div>
-      {/* Renderize o formulário de edição se houver um produto em edição */}
-      {editingProduct && (
+      <h2>Editar Produto</h2>
+      <div>
+        <h3>Formulário de Edição</h3>
         <ProductForm
-          onSave={handleSaveEdit}
-          onCancel={handleCancelEdit}
-          initialData={editingProduct}
+          initialData={produto}
+          onSave={handleSalvar} // Passa a função de salvar produto editado
+          onCancel={onCancel}
         />
-      )}
-
-      {/* Renderize a lista de produtos */}
-      <ProductList produtos={produtos} onEdit={handleEdit} />
-
-      {/* Adicione um botão para limpar o localStorage */}
-      <button onClick={handleClean}>Limpar localStorage</button>
+      </div>
     </div>
   );
 };
 
-export default ProductListPage;
+export default EditProduct;
